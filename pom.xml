@@ -1,0 +1,456 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>gov.va.isaac.db.solor</groupId>
+	<artifactId>solor-all-transform</artifactId>
+	<version>2015.01.05</version>
+
+	<!-- Project metadata -->
+	<packaging>pom</packaging>
+	
+	<name>ISAAC SOLOR DB Assembly</name>
+	<description>A SOLOR database, including sct-econcept-2014.01.31-build-8-active-only, loinc-econcept-2.48-loader-2.9 and RxNorm 2014.09.02</description>
+
+	<url>https://csfe.aceworkspace.net/sf/projects/veterans_administration_project/</url>
+
+	<properties>
+		<!-- For no classifier, leave this blank but do not remove -->
+		<resultArtifactClassifier>active-only</resultArtifactClassifier>
+		<isaac.version>Sprint_17-SNAPSHOT</isaac.version>
+		
+		<!-- Don't edit these -->
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.type>bdb.zip</project.type>
+		<project.classifier>${resultArtifactClassifier}</project.classifier>
+	</properties>
+	
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+			<comments>Copyright Notice
+				This is a work of the U.S. Government and is not subject to copyright
+				protection in the United States. Foreign copyrights may apply.
+			</comments>
+		</license>
+		<license>
+			<name>SNOMED CT affiliate license agreement</name>
+			<url>https://uts.nlm.nih.gov/help/license/LicenseAgreement.pdf</url>
+			<comments>The SNOMED CT content packaged by this module is governed by the SNOMED CT affiliate license agreement</comments>
+		</license>
+		<license>
+			<name>LOINC License</name>
+			<url>https://loinc.org/terms-of-use</url>
+			<comments>The LOINC content packaged by this module is governed by the LOINC license</comments>
+		</license>
+		<license>
+			<name>RxNorm / UMLS license</name>
+			<url>https://uts.nlm.nih.gov/license.html</url>
+			<comments>The RxNorm content packaged by this module is governed licensed by the National Library of Medicine, Department of Health and Human Services</comments>
+		</license>
+	</licenses>
+	
+	<!-- Git -->
+	<scm>
+		<url>https://csfe.aceworkspace.net/gerrit/gitweb?p=isaac-db-solor.git;tflink=projects.informatics_architecture/scm.ISAAC_DB_SOLOR</url>
+	</scm>
+
+	<!-- Dependencies -->
+	<dependencies>
+		<dependency>
+			<groupId>org.ihtsdo.sct.baseline</groupId>
+			<artifactId>sct-econcept</artifactId>
+			<version>2014.01.31-build-8</version>  <!-- This is actually 2014.07, they used the wrong version # -->
+			<classifier>active-only</classifier>
+			<type>zip</type>
+			<scope>compile</scope>
+			<optional>true</optional>  <!-- Not needed at runtime -->
+			<!-- Sigh... SCT is defined in a particularly silly way... need to exclude 
+				all of these, to not waste everyones time fetching them -->
+			<exclusions>
+				<exclusion>
+					<groupId>org.ihtsdo.sct.rf2</groupId>
+					<artifactId>sct-rf2-arf-econcept-full</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.ihtsdo.sct</groupId>
+					<artifactId>mrcm-refset-specs</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.ihtsdo</groupId>
+					<artifactId>tk-spelling-variants</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.ihtsdo</groupId>
+					<artifactId>tk-case-sensitive-words</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>gov.va.oia.terminology.converters</groupId>
+			<artifactId>RxNorm-econcept</artifactId>
+			<version>2014.09.02-loader-1.3.2</version>
+			<type>zip</type>
+			<scope>compile</scope>
+			<optional>true</optional>  <!-- Not needed at runtime -->
+		</dependency>
+		<dependency>
+			<groupId>gov.va.oia.terminology.converters</groupId>
+			<artifactId>loinc-econcept</artifactId>
+			<version>2.48-loader-2.9</version>
+			<type>zip</type>
+			<scope>compile</scope>
+			<optional>true</optional>  <!-- Not needed at runtime -->
+		</dependency>
+	</dependencies>
+
+	<!-- Unpack data projects, load econcepts files, create ISAAC path, repack database -->
+	<build>
+		<plugins>
+			<!-- Java version 1.8 -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+			
+			<!-- Configure logging for the mojo code we will hit. -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>set-system-properties</goal>
+						</goals>
+						<configuration>
+							<properties>
+								<property>
+									<name>logback.configurationFile</name>
+									<value>${project.basedir}/logback.xml</value>
+								</property>
+							</properties>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- create a property for the classifier (if the classifier property is set) that has a leading hyphen -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.9.1</version>
+				<executions>
+					<execution>
+						<id>regex-property</id>
+						<phase>initialize</phase>
+						<goals>
+							<goal>regex-property</goal>
+						</goals>
+						<configuration>
+							<!-- If we match just a hyphen (no classifier) then replace (blank) otherwise, we get the 'value' which has a prefixed hyphen -->
+							<name>resultArtifactClassifierWithLeadingHyphen</name>
+							<value>-${resultArtifactClassifier}</value>
+							<regex>^-$</regex>
+							<replacement>${resultArtifactClassifier}</replacement>
+							<failIfNoMatch>false</failIfNoMatch>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<!-- metadata we want in the output package -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>copy metadata files</id>
+						<phase>generate-sources</phase>
+						<configuration>
+							<target>
+								<!-- Copy the things necessary to reproduce the build -->
+								<copy filtering="false"
+									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/">
+									<fileset dir="${basedir}">
+										<include name="*.txt"/>
+										<include name="*.xml"/>
+									</fileset>
+									<fileset dir="${basedir}">
+										<include name="src/**/*"/>
+									</fileset>
+								</copy>
+								
+								<!-- Create a file with the active build properties -->
+								<echoproperties destfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties"/>
+								
+								<!-- Setup the manifest, copy the license files -->
+								<copy filtering="false"
+									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
+									<fileset dir="${basedir}">
+										<include name="LICENSE.txt"/>
+										<include name="NOTICE.txt"/>
+									</fileset>
+								</copy>
+								
+								<!-- Write a manifest file, with properties filled in -->
+								<copy filtering="true"
+									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
+									<fileset dir="${basedir}/src/assembly/">
+										<include name="MANIFEST.MF"/>
+									</fileset>
+									<filterset begintoken="${" endtoken="}"
+										filtersfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties"/>
+								</copy>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<id>unpack-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>org.ihtsdo.sct.baseline</includeGroupIds>
+							<includeArtifactIds>sct-econcept</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/generated-resources/sct-econcept</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack-rxnorm-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>gov.va.oia.terminology.converters</includeGroupIds>
+							<includeArtifactIds>RxNorm-econcept</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/generated-resources/RxNorm-econcept</outputDirectory>
+						</configuration>
+					</execution>
+					<execution>
+						<id>unpack-loinc-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>unpack-dependencies</goal>
+						</goals>
+						<configuration>
+							<includeGroupIds>gov.va.oia.terminology.converters</includeGroupIds>
+							<includeArtifactIds>loinc-econcept</includeArtifactIds>
+							<outputDirectory>${project.build.directory}/generated-resources/loinc-econcept</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>gov.va.isaac.modules</groupId>
+				<artifactId>mojos</artifactId>
+				<version>${isaac.version}</version>
+				<executions>
+					<execution>
+						<id>setup store</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>setup-terminology-store</goal>
+						</goals>
+						<configuration>
+							<bdbFolderLocation>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</bdbFolderLocation>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>load-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>load-index-bdb</goal>
+						</goals>
+						<configuration>
+							<setupAndShutdown>false</setupAndShutdown>
+							<econFileStrings>
+								<econFileString>${project.build.directory}/generated-resources/sct-econcept/eConcepts.jbin</econFileString>
+								<econFileString>${project.build.directory}/generated-resources/RxNorm-econcept/RRF-RXN.jbin</econFileString>
+								<econFileString>${project.build.directory}/generated-resources/loinc-econcept/loincEConcepts.jbin</econFileString>
+							</econFileStrings>
+							<terminologyRoots>
+								<MojoConceptSpec>
+									<fsn>SNOMED CT Concept (SNOMED RT+CTV3)</fsn>
+									<uuid>ee9ac5d2-a07c-3981-a57a-f7f26baf38d8</uuid>
+								</MojoConceptSpec>
+								<MojoConceptSpec>
+									<fsn>LOINC</fsn>
+									<uuid>3958d043-9e8c-508e-bf6d-fd9c83a856da</uuid>
+								</MojoConceptSpec>
+							</terminologyRoots>
+						</configuration>
+					</execution>
+
+					<!-- Creates the ISAAC paths - f5c0a264-15af-5b94-a964-bb912ea5634f -->
+					<execution>
+						<id>create-isaac-origin-path</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create-path</goal>
+						</goals>
+						<configuration>
+							<pathFsn>ISAAC development path origin</pathFsn>
+							<pathPrefTerm>ISAAC development path origin</pathPrefTerm>
+							<originPathUuids>
+								<!-- SNOMED Core -->
+								<uuid>8c230474-9f11-30ce-9cad-185a96fd03a2</uuid>
+								<!-- LOINC Path -->
+								<uuid>b2b1cc96-9ca6-5513-aad9-aa21e61ddc29</uuid>
+								<!-- RxNorm Path -->
+								<uuid>d1cfff32-d25d-57e6-8cc4-fd433cd1096d</uuid>
+							</originPathUuids>
+							<!-- The parent of ISAAC Path, the "release" concept, also parent of SNOMED Core -->
+							<parentPathUuid>88f89cc0-1d94-34a4-85ed-aa1949079314</parentPathUuid>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>create-isaac-dev-path</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create-path</goal>
+						</goals>
+						<configuration>
+							<pathFsn>ISAAC development path</pathFsn>
+							<pathPrefTerm>ISAAC development path</pathPrefTerm>
+							<originPathFsns>
+								<fsn>ISAAC development path origin</fsn>
+							</originPathFsns>
+							<!-- The parent of ISAAC Path, the "release" concept, also parent of SNOMED Core -->
+							<parentPathUuid>88f89cc0-1d94-34a4-85ed-aa1949079314</parentPathUuid>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>create-isaac-release-path</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create-path</goal>
+						</goals>
+						<configuration>
+							<pathFsn>ISAAC release path</pathFsn>
+							<pathPrefTerm>ISAAC release path</pathPrefTerm>
+							<originPathFsns>
+								<fsn>ISAAC development path</fsn>
+							</originPathFsns>
+							<!-- The parent of ISAAC Path, the "release" concept, also parent of SNOMED Core -->
+							<parentPathUuid>88f89cc0-1d94-34a4-85ed-aa1949079314</parentPathUuid>
+						</configuration>
+					</execution>
+
+					<!-- Creates the information model metadata -->
+					<execution>
+						<id>create-info-model-metadata</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>create-metadata</goal>
+						</goals>
+					</execution>
+
+					<!-- Shutdown database -->
+					<execution>
+						<id>shutdown</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>shutdown-terminology-store</goal>
+						</goals>
+						<configuration />
+					</execution>
+
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<version>2.4</version>
+				<executions>
+					<execution>
+						<id>zip</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<descriptors>
+								<descriptor>${basedir}/src/assembly/assembly.xml</descriptor>
+							</descriptors>
+							<attach>false</attach>
+							<encoding>UTF-8</encoding>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>attach-artifact</id>
+						<goals>
+							<goal>attach-artifact</goal>
+						</goals>
+						<configuration>
+							<artifacts>
+								<artifact>
+									<type>bdb.zip</type>
+									<!-- Note that the assembly plugin doesn't use the same classifier - we hack the classifier it returns to be a mis
+									mash of classifier and part of type.  So there is always a classifier on the produced zip file, even if no classifier
+									was specified by the user.  During artifact attachment, this classifier/type mess is corrected. -->
+									<file>${project.build.directory}/${project.build.finalName}-${resultArtifactClassifier}.bdb.zip</file>
+									<classifier>${resultArtifactClassifier}</classifier>
+								</artifact>
+							</artifacts>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!--Gitflow for releases - note build is disabled during release - it is expected you build and test first, before tagging-->
+			<plugin>
+				<groupId>external.atlassian.jgitflow</groupId>
+				<artifactId>jgitflow-maven-plugin</artifactId>
+				<version>1.0-m4.3</version>
+				<configuration>
+					<pushReleases>true</pushReleases>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<scmCommentPrefix>[jgitflow-plugin]</scmCommentPrefix>
+					<enableSshAgent>true</enableSshAgent>
+					<noReleaseBuild>true</noReleaseBuild>
+					<flowInitContext>
+						<masterBranchName>master</masterBranchName>
+						<developBranchName>develop</developBranchName>
+						<featureBranchPrefix>feature-</featureBranchPrefix>
+						<releaseBranchPrefix>release-</releaseBranchPrefix>
+						<hotfixBranchPrefix>hotfix-</hotfixBranchPrefix>
+					</flowInitContext>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
