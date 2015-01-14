@@ -4,7 +4,7 @@
 	
 	<groupId>gov.va.isaac.db.solor</groupId>
 	<artifactId>solor-all-transform</artifactId>
-	<version>Baseline_01</version>
+	<version>Baseline_01-SNAPSHOT</version>
 
 	<!-- Project metadata -->
 	<packaging>pom</packaging>
