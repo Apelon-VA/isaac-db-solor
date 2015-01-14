@@ -434,7 +434,6 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<scmCommentPrefix>[jgitflow-plugin]</scmCommentPrefix>
 					<enableSshAgent>true</enableSshAgent>
-					<noReleaseBuild>true</noReleaseBuild>
 					<flowInitContext>
 						<masterBranchName>master</masterBranchName>
 						<developBranchName>develop</developBranchName>
