@@ -106,8 +106,17 @@
 	</dependencies>
 
 	<!-- Unpack data projects, load econcepts files, create ISAAC path, repack database -->
-	<build>
+	<build>	
+			<!-- disable - it seems to rerun thing it shouldn't in gitflow - which breaks things. -->	
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+		
 			<!-- Java version 1.8 -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
