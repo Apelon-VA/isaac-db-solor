@@ -107,6 +107,23 @@
 
 	<!-- Unpack data projects, load econcepts files, create ISAAC path, repack database -->
 	<build>	
+		<pluginManagement>
+			<plugins>	
+				<!-- disable - it seems to rerun things it shouldn't in gitflow - which breaks things.
+					http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html -->	
+				<plugin>
+					<artifactId>maven-source-plugin</artifactId>
+					<version>2.4</version>
+					<executions>
+				        <execution>
+          					<id>attach-sources</id>
+          					<phase>none</phase>
+   					     </execution>
+  				    </executions>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+			
 		<plugins>
 			<!-- Java version 1.8 -->
 			<plugin>
@@ -429,7 +446,6 @@
 					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<scmCommentPrefix>[jgitflow-plugin]</scmCommentPrefix>
 					<enableSshAgent>true</enableSshAgent>
-					<useReleaseProfile>false</useReleaseProfile> <!-- disable - don't need - and its broken in maven (runs twice, breaks the build) -->
 					<flowInitContext>
 						<masterBranchName>master</masterBranchName>
 						<developBranchName>develop</developBranchName>
