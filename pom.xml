@@ -109,13 +109,17 @@
 	<build>	
 		<pluginManagement>
 			<plugins>	
-			<!-- disable - it seems to rerun thing it shouldn't in gitflow - which breaks things. -->	
+				<!-- disable - it seems to rerun things it shouldn't in gitflow - which breaks things.
+					http://blog.peterlynch.ca/2010/05/maven-how-to-prevent-generate-sources.html -->	
 				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-source-plugin</artifactId>
-					<configuration>
-						<skipSource>true</skipSource>
-					</configuration>
+					<version>2.4</version>
+					<executions>
+				        <execution>
+          					<id>attach-sources</id>
+          					<phase>none</phase>
+   					     </execution>
+  				    </executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
