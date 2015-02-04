@@ -427,6 +427,8 @@
 					<pushReleases>true</pushReleases>
 					<scmCommentPrefix>[jgitflow-plugin]</scmCommentPrefix>
 					<enableSshAgent>true</enableSshAgent>
+					<allowSnapshots>true</allowSnapshots>
+					<enableFeatureVersions>true</enableFeatureVersions>
 					<useReleaseProfile>false</useReleaseProfile> <!-- disable - don't need - and its broken in maven (runs twice, breaks the build) -->
 					<flowInitContext>
 						<masterBranchName>master</masterBranchName>
