@@ -9,14 +9,14 @@
 	<packaging>pom</packaging>
 	
 	<name>ISAAC SOLOR DB Assembly</name>
-	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.0.1 and RxNorm-econcept-2014.09.02-loader-2.0.1</description>
+	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.0.1 and RxNormH-econcept-2014.09.02-loader-3.0</description>
 
 	<url>https://csfe.aceworkspace.net/sf/projects/veterans_administration_project/</url>
 
 	<properties>
 		<!-- For no classifier, leave this blank but do not remove -->
 		<resultArtifactClassifier>active-only</resultArtifactClassifier>
-		<isaac.version>Sprint_18-SNAPSHOT</isaac.version>
+		<isaac.version>Sprint_18</isaac.version>
 		
 		<!-- Don't edit these -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -89,8 +89,8 @@
 		</dependency>
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
-			<artifactId>RxNorm-econcept</artifactId>
-			<version>2014.09.02-loader-2.0.1</version>
+			<artifactId>RxNormH-econcept</artifactId>
+			<version>2014.09.02-loader-3.0</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -117,28 +117,6 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>
-			
-			<!-- Configure logging for the mojo code we will hit. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>set-system-properties</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<property>
-									<name>logback.configurationFile</name>
-									<value>${project.basedir}/logback.xml</value>
-								</property>
-							</properties>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			
 			<!-- create a property for the classifier (if the classifier property is set) that has a leading hyphen -->
@@ -257,7 +235,7 @@
 						</goals>
 						<configuration>
 							<includeGroupIds>gov.va.oia.terminology.converters</includeGroupIds>
-							<includeArtifactIds>RxNorm-econcept</includeArtifactIds>
+							<includeArtifactIds>RxNormH-econcept</includeArtifactIds>
 							<outputDirectory>${project.build.directory}/generated-resources/RxNorm-econcept</outputDirectory>
 						</configuration>
 					</execution>
@@ -277,6 +255,14 @@
 			</plugin>
 
 			<plugin>
+				<dependencies>
+					<dependency>
+						<groupId>gov.va.isaac.modules</groupId>
+						<artifactId>isaac-db-processing-rules</artifactId>
+						<version>${isaac.version}</version>
+					</dependency>
+				</dependencies>
+
 				<groupId>gov.va.isaac.modules</groupId>
 				<artifactId>mojos</artifactId>
 				<version>${isaac.version}</version>
@@ -334,7 +320,8 @@
 								<!-- LOINC Path -->
 								<uuid>b2b1cc96-9ca6-5513-aad9-aa21e61ddc29</uuid>
 								<!-- RxNorm Path -->
-								<uuid>d1cfff32-d25d-57e6-8cc4-fd433cd1096d</uuid>
+								<!--uuid>d1cfff32-d25d-57e6-8cc4-fd433cd1096d</uuid-->
+								<uuid>763c21ad-55e3-5bb3-af1e-3e4fb475de44</uuid>
 							</originPathUuids>
 							<!-- The parent of ISAAC Path, the "release" concept, also parent of SNOMED Core -->
 							<parentPathUuid>88f89cc0-1d94-34a4-85ed-aa1949079314</parentPathUuid>
@@ -382,6 +369,25 @@
 						<goals>
 							<goal>create-metadata</goal>
 						</goals>
+					</execution>
+					
+					<execution>
+						<id>execute rules</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute-transforms</goal>
+						</goals>
+						<configuration>
+							<summaryOutputFolder>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}</summaryOutputFolder>
+							<transforms>
+								<Transform>
+									<name>Generate Missing Preferred Terms</name>
+								</Transform>
+								<Transform>
+									<name>RxNorm Hierarchy Additions</name>
+								</Transform>
+							</transforms>
+						</configuration>
 					</execution>
 
 					<!-- Shutdown database -->
