@@ -1,23 +1,22 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	
 	<groupId>gov.va.isaac.db.solor</groupId>
 	<artifactId>solor-all-transform</artifactId>
-	<version>Baseline_01</version>
+	<version>Baseline_02</version>
 
 	<!-- Project metadata -->
 	<packaging>pom</packaging>
 	
 	<name>ISAAC SOLOR DB Assembly</name>
-	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.0.1 and RxNorm-econcept-2014.09.02-loader-2.0.1</description>
+	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.0.1 and RxNormH-econcept-2014.09.02-loader-3.0</description>
 
 	<url>https://csfe.aceworkspace.net/sf/projects/veterans_administration_project/</url>
 
 	<properties>
 		<!-- For no classifier, leave this blank but do not remove -->
 		<resultArtifactClassifier>active-only</resultArtifactClassifier>
-		<isaac.version>Sprint_17.0</isaac.version>
+		<isaac.version>Sprint_18</isaac.version>
 		
 		<!-- Don't edit these -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -90,8 +89,8 @@
 		</dependency>
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
-			<artifactId>RxNorm-econcept</artifactId>
-			<version>2014.09.02-loader-2.0.1</version>
+			<artifactId>RxNormH-econcept</artifactId>
+			<version>2014.09.02-loader-3.0</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -118,28 +117,6 @@
 					<source>1.8</source>
 					<target>1.8</target>
 				</configuration>
-			</plugin>
-			
-			<!-- Configure logging for the mojo code we will hit. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>properties-maven-plugin</artifactId>
-				<version>1.0-alpha-2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>set-system-properties</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<property>
-									<name>logback.configurationFile</name>
-									<value>${project.basedir}/logback.xml</value>
-								</property>
-							</properties>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			
 			<!-- create a property for the classifier (if the classifier property is set) that has a leading hyphen -->
@@ -196,37 +173,33 @@
 						<configuration>
 							<target>
 								<!-- Copy the things necessary to reproduce the build -->
-								<copy filtering="false"
-									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/">
+								<copy filtering="false" toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/">
 									<fileset dir="${basedir}">
-										<include name="*.txt"/>
-										<include name="*.xml"/>
+										<include name="*.txt" />
+										<include name="*.xml" />
 									</fileset>
 									<fileset dir="${basedir}">
-										<include name="src/**/*"/>
+										<include name="src/**/*" />
 									</fileset>
 								</copy>
 								
 								<!-- Create a file with the active build properties -->
-								<echoproperties destfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties"/>
+								<echoproperties destfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties" />
 								
 								<!-- Setup the manifest, copy the license files -->
-								<copy filtering="false"
-									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
+								<copy filtering="false" toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
 									<fileset dir="${basedir}">
-										<include name="LICENSE.txt"/>
-										<include name="NOTICE.txt"/>
+										<include name="LICENSE.txt" />
+										<include name="NOTICE.txt" />
 									</fileset>
 								</copy>
 								
 								<!-- Write a manifest file, with properties filled in -->
-								<copy filtering="true"
-									toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
+								<copy filtering="true" toDir="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/">
 									<fileset dir="${basedir}/src/assembly/">
-										<include name="MANIFEST.MF"/>
+										<include name="MANIFEST.MF" />
 									</fileset>
-									<filterset begintoken="${" endtoken="}"
-										filtersfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties"/>
+									<filterset begintoken="${" endtoken="}" filtersfile="${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}/pom.properties" />
 								</copy>
 							</target>
 						</configuration>
@@ -262,7 +235,7 @@
 						</goals>
 						<configuration>
 							<includeGroupIds>gov.va.oia.terminology.converters</includeGroupIds>
-							<includeArtifactIds>RxNorm-econcept</includeArtifactIds>
+							<includeArtifactIds>RxNormH-econcept</includeArtifactIds>
 							<outputDirectory>${project.build.directory}/generated-resources/RxNorm-econcept</outputDirectory>
 						</configuration>
 					</execution>
@@ -282,6 +255,14 @@
 			</plugin>
 
 			<plugin>
+				<dependencies>
+					<dependency>
+						<groupId>gov.va.isaac.modules</groupId>
+						<artifactId>isaac-db-processing-rules</artifactId>
+						<version>${isaac.version}</version>
+					</dependency>
+				</dependencies>
+
 				<groupId>gov.va.isaac.modules</groupId>
 				<artifactId>mojos</artifactId>
 				<version>${isaac.version}</version>
@@ -339,7 +320,8 @@
 								<!-- LOINC Path -->
 								<uuid>b2b1cc96-9ca6-5513-aad9-aa21e61ddc29</uuid>
 								<!-- RxNorm Path -->
-								<uuid>d1cfff32-d25d-57e6-8cc4-fd433cd1096d</uuid>
+								<!--uuid>d1cfff32-d25d-57e6-8cc4-fd433cd1096d</uuid-->
+								<uuid>763c21ad-55e3-5bb3-af1e-3e4fb475de44</uuid>
 							</originPathUuids>
 							<!-- The parent of ISAAC Path, the "release" concept, also parent of SNOMED Core -->
 							<parentPathUuid>88f89cc0-1d94-34a4-85ed-aa1949079314</parentPathUuid>
@@ -388,6 +370,25 @@
 							<goal>create-metadata</goal>
 						</goals>
 					</execution>
+					
+					<execution>
+						<id>execute rules</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>execute-transforms</goal>
+						</goals>
+						<configuration>
+							<summaryOutputFolder>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/META-INF/maven/${project.groupId}/${project.artifactId}</summaryOutputFolder>
+							<transforms>
+								<Transform>
+									<name>Generate Missing Preferred Terms</name>
+								</Transform>
+								<Transform>
+									<name>RxNorm Hierarchy Additions</name>
+								</Transform>
+							</transforms>
+						</configuration>
+					</execution>
 
 					<!-- Shutdown database -->
 					<execution>
@@ -423,18 +424,18 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!--Gitflow for releases - note build is disabled during release - it is expected you build and test first, before tagging-->
+
 			<plugin>
 				<groupId>external.atlassian.jgitflow</groupId>
 				<artifactId>jgitflow-maven-plugin</artifactId>
 				<version>1.0-m4.3</version>
 				<configuration>
 					<pushReleases>true</pushReleases>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
 					<scmCommentPrefix>[jgitflow-plugin]</scmCommentPrefix>
 					<enableSshAgent>true</enableSshAgent>
-					<noReleaseBuild>true</noReleaseBuild>
+					<allowSnapshots>true</allowSnapshots>
+					<enableFeatureVersions>true</enableFeatureVersions>
+					<useReleaseProfile>false</useReleaseProfile> <!-- disable - don't need - and its broken in maven (runs twice, breaks the build) -->
 					<flowInitContext>
 						<masterBranchName>master</masterBranchName>
 						<developBranchName>develop</developBranchName>
