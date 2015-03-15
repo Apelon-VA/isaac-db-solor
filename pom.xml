@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>RxNormH-econcept</artifactId>
-			<version>2014.09.02-loader-3.1</version>
+			<version>2014.09.02-loader-3.2-SNAPSHOT</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>loinc-econcept</artifactId>
-			<version>2.48-loader-3.1</version>
+			<version>2.48-loader-3.2-SNAPSHOT</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -387,7 +387,7 @@
 									<name>RxNorm Hierarchy Additions</name>
 								</Transform>
 								<Transform>
-									<name>LOINC representation rules</name>
+									<name>LOINC spreadsheet rules</name>
 								</Transform>
 							</transforms>
 						</configuration>
