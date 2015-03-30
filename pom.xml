@@ -274,7 +274,7 @@
 							<goal>setup-terminology-store</goal>
 						</goals>
 						<configuration>
-							<bdbFolderLocation>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</bdbFolderLocation>
+							<bdbFolderLocation>${project.build.directory}/${project.build.finalName}-Nebula${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</bdbFolderLocation>
 						</configuration>
 					</execution>
 
@@ -392,6 +392,18 @@
 							</transforms>
 						</configuration>
 					</execution>
+					
+					<!--Export the new DB to eConcept -->
+					<execution>
+						<id>export-to-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-to-econcept</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.jbin</outputFile>
+						</configuration>
+					</execution>
 
 					<!-- Shutdown database -->
 					<execution>
@@ -423,6 +435,35 @@
 							</descriptors>
 							<attach>false</attach>
 							<encoding>UTF-8</encoding>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<!-- No comment on the level of HACKing that is required here to make maven do something sensible... 
+				This can go away after we fix the lifecycle management of the DB-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<id>span-DB-Build-2</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>mvn</executable>
+							<arguments>
+								<argument>-f</argument>
+								<argument>pomHack.xml</argument>
+								<argument>-Disaac.version=${isaac.version}</argument>
+								<argument>-DinputJBin=${project.build.directory}/${project.build.finalName}-active-only.jbin</argument>
+								<argument>-DoutputFolder=${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</argument>
+								<argument>compile</argument>
+							</arguments>
 						</configuration>
 					</execution>
 				</executions>

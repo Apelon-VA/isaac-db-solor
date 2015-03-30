@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<!--This pom file is nothing more than a hack to work around an almost comical set of stupid bugs both in the DB management code
+		and in Maven.
+		
+		Eventually, we will have a DB we can actually start, stop, and start again in the same JVM without having all sort of issues
+	-->
+	
+	<groupId>gov.va.isaac.db.solor</groupId>
+	<artifactId>solor-all-transform-hack</artifactId>
+	<version>no-version</version>
+
+	<!-- Project metadata -->
+	<packaging>pom</packaging>
+	
+	<name>ISAAC SOLOR DB Assembly HACK</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>gov.va.isaac.modules</groupId>
+				<artifactId>mojos</artifactId>
+				<version>${isaac.version}</version>
+				<executions>
+					<execution>
+						<id>load-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>load-index-bdb</goal>
+						</goals>
+						<configuration>
+							<setupAndShutdown>true</setupAndShutdown>
+							<loadDefaultMetadata>false</loadDefaultMetadata>
+							<bdbFolderLocation>${outputFolder}</bdbFolderLocation>
+							<econFileStrings>
+								<econFileString>${inputJBin}</econFileString>
+							</econFileStrings>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>
