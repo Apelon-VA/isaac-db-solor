@@ -9,14 +9,14 @@
 	<packaging>pom</packaging>
 	
 	<name>ISAAC SOLOR DB Assembly</name>
-	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.1 and RxNormH-econcept-2014.09.02-loader-3.1</description>
+	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.2 and RxNormH-econcept-2014.09.02-loader-3.2</description>
 
 	<url>https://csfe.aceworkspace.net/sf/projects/veterans_administration_project/</url>
 
 	<properties>
 		<!-- For no classifier, leave this blank but do not remove -->
 		<resultArtifactClassifier>active-only</resultArtifactClassifier>
-		<isaac.version>Sprint_20-SNAPSHOT</isaac.version>
+		<isaac.version>Sprint_20</isaac.version>
 		
 		<!-- Don't edit these -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>RxNormH-econcept</artifactId>
-			<version>2014.09.02-loader-3.2-SNAPSHOT</version>
+			<version>2014.09.02-loader-3.2</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>loinc-econcept</artifactId>
-			<version>2.48-loader-3.2-SNAPSHOT</version>
+			<version>2.48-loader-3.2</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
