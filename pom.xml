@@ -3,20 +3,20 @@
 	
 	<groupId>gov.va.isaac.db.solor</groupId>
 	<artifactId>solor-all-transform</artifactId>
-	<version>Baseline_03</version>
+	<version>Baseline_04</version>
 
 	<!-- Project metadata -->
 	<packaging>pom</packaging>
 	
 	<name>ISAAC SOLOR DB Assembly</name>
-	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.1 and RxNormH-econcept-2014.09.02-loader-3.1</description>
+	<description>A SOLOR database, including sct-econcept-2015.01.31-build-5-active-only, loinc-econcept-2.48-loader-3.2 and RxNormH-econcept-2014.09.02-loader-3.2</description>
 
 	<url>https://csfe.aceworkspace.net/sf/projects/veterans_administration_project/</url>
 
 	<properties>
 		<!-- For no classifier, leave this blank but do not remove -->
 		<resultArtifactClassifier>active-only</resultArtifactClassifier>
-		<isaac.version>Sprint_19.1</isaac.version>
+		<isaac.version>Sprint_20</isaac.version>
 		
 		<!-- Don't edit these -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -90,7 +90,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>RxNormH-econcept</artifactId>
-			<version>2014.09.02-loader-3.1</version>
+			<version>2014.09.02-loader-3.2</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -98,7 +98,7 @@
 		<dependency>
 			<groupId>gov.va.oia.terminology.converters</groupId>
 			<artifactId>loinc-econcept</artifactId>
-			<version>2.48-loader-3.1</version>
+			<version>2.48-loader-3.2</version>
 			<type>jbin.zip</type>
 			<scope>compile</scope>
 			<optional>true</optional>  <!-- Not needed at runtime -->
@@ -274,7 +274,7 @@
 							<goal>setup-terminology-store</goal>
 						</goals>
 						<configuration>
-							<bdbFolderLocation>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</bdbFolderLocation>
+							<bdbFolderLocation>${project.build.directory}/${project.build.finalName}-Nebula${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</bdbFolderLocation>
 						</configuration>
 					</execution>
 
@@ -387,9 +387,21 @@
 									<name>RxNorm Hierarchy Additions</name>
 								</Transform>
 								<Transform>
-									<name>LOINC representation rules</name>
+									<name>LOINC spreadsheet rules</name>
 								</Transform>
 							</transforms>
+						</configuration>
+					</execution>
+					
+					<!--Export the new DB to eConcept -->
+					<execution>
+						<id>export-to-econcept</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>export-to-econcept</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.jbin</outputFile>
 						</configuration>
 					</execution>
 
@@ -423,6 +435,35 @@
 							</descriptors>
 							<attach>false</attach>
 							<encoding>UTF-8</encoding>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+
+			<!-- No comment on the level of HACKing that is required here to make maven do something sensible... 
+				This can go away after we fix the lifecycle management of the DB-->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<id>span-DB-Build-2</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>mvn</executable>
+							<arguments>
+								<argument>-f</argument>
+								<argument>pomHack.xml</argument>
+								<argument>-Disaac.version=${isaac.version}</argument>
+								<argument>-DinputJBin=${project.build.directory}/${project.build.finalName}-active-only.jbin</argument>
+								<argument>-DoutputFolder=${project.build.directory}/${project.build.finalName}${resultArtifactClassifierWithLeadingHyphen}.bdb/berkeley-db</argument>
+								<argument>compile</argument>
+							</arguments>
 						</configuration>
 					</execution>
 				</executions>
