@@ -3,7 +3,7 @@
 	
 	<groupId>gov.va.isaac.db.solor</groupId>
 	<artifactId>solor-all-transform</artifactId>
-	<version>Baseline_04</version>
+	<version>Baseline_05</version>
 
 	<!-- Project metadata -->
 	<packaging>pom</packaging>
@@ -16,7 +16,7 @@
 	<properties>
 		<!-- For no classifier, leave this blank but do not remove -->
 		<resultArtifactClassifier>active-only</resultArtifactClassifier>
-		<isaac.version>Sprint_20</isaac.version>
+		<isaac.version>Sprint_21</isaac.version>
 		
 		<!-- Don't edit these -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -388,6 +388,9 @@
 								</Transform>
 								<Transform>
 									<name>LOINC spreadsheet rules</name>
+								</Transform>
+								<Transform>
+									<name>RxNorm spreadsheet rules</name>
 								</Transform>
 							</transforms>
 						</configuration>
