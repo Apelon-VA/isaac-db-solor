@@ -3,7 +3,7 @@
 	
 	<groupId>gov.va.isaac.db.solor</groupId>
 	<artifactId>solor-all-transform</artifactId>
-	<version>Baseline_06-SNAPSHOT</version>
+	<version>Baseline_05</version>
 
 	<!-- Project metadata -->
 	<packaging>pom</packaging>
